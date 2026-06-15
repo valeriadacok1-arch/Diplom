@@ -11,6 +11,7 @@
 - Python
 - Pycharm
 - Telegram
+- Visual studio
   
 ## Опублікований продукт
 https://www.pythonanywhere.com/user/pkvkkdk/files/home/pkvkkdk/telegram_bot.py?edit
