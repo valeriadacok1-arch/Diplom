@@ -14,4 +14,4 @@
 - Visual studio
   
 ## Опублікований продукт
-https://www.pythonanywhere.com/user/pkvkkdk/files/home/pkvkkdk/telegram_bot.py?edit
+https://t.me/Taskplaner3232344_bot
