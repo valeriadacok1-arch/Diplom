@@ -7,7 +7,7 @@ import urllib.request
 import urllib.parse
 import traceback
 
-BOT_TOKEN = "8469000525:AAFmCg5qGEEWxCuW997n51wV2AdN7hmJVYQ"
+BOT_TOKEN = "8863515134:AAHxqgxpJCMGjShDeCKLCUc83LdOpDvkKYM"
 BASE_URL = f"https://api.telegram.org/bot{BOT_TOKEN}/"
 DATA_DIR = "data"
 USERS_FILE = os.path.join(DATA_DIR, "users.json")
@@ -474,6 +474,9 @@ def process_message(update):
     if text == "📋 Мої завдання" and state == "main_menu":
         list_user_tasks_messages(chat_id, tasks)
         return
+    if text == "📊 Статистика" and state == "main_menu":
+        show_user_statistics(chat_id, tasks)
+        return
 
     if state == "enter_task_name":
         user["temp_task"] = {"name": text}
@@ -684,6 +687,46 @@ def main():
             traceback.print_exc()
             time.sleep(2)
         time.sleep(0.3)
+
+def main_keyboard_markup():
+    keyboard = [
+        ["➕ Додати завдання", "📋 Мої завдання", "📊 Статистика"], 
+        ["🔄 Почати спочатку"]
+    ]
+    return {"keyboard": keyboard, "resize_keyboard": True}
+
+def show_user_statistics(chat_id, tasks):
+    user_tasks = [t for t in tasks.values() if str(t.get("user_id")) == str(chat_id)]
+    
+    if not user_tasks:
+        send_message(chat_id, "📊 У тебе ще немає жодного завдання для розрахунку статистики. Створи щось! 😉", reply_markup=main_keyboard_markup())
+        return
+
+    total = len(user_tasks)
+    done = len([t for t in user_tasks if t.get("status") == "виконане"])
+    planned = total - done
+
+    success_rate = int((done / total) * 100) if total > 0 else 0
+
+    if success_rate == 100:
+        motivation = "🏆 Ідеально! Ти справжній продуктивний ніндзя!"
+    elif success_rate >= 70:
+        motivation = "🚀 Чудовий результат! Продовжуй у тому ж дусі!"
+    elif success_rate >= 40:
+        motivation = "📈 Хороший рух, половину або навіть більше вже зроблено!"
+    else:
+        motivation = "🌱 Початок покладено! Крок за кроком до мети."
+
+    stat_text = (
+        "📊 <b>Твоя статистика продуктивності:</b>\n\n"
+        f"📝 Всього завдань у базі: <b>{total}</b>\n"
+        f"✅ Виконано успішно: <b>{done}</b>\n"
+        f"⏳ Очікують виконання: <b>{planned}</b>\n\n"
+        f"🎯 Рівень продуктивності: <b>{success_rate}%</b>\n"
+        f"<i>{motivation}</i>"
+    )
+    
+    send_message(chat_id, stat_text, reply_markup=main_keyboard_markup())
 
 if __name__ == "__main__":
     main()
